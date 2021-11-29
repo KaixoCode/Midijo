@@ -1,14 +1,10 @@
 # Midijo
-
-**!! Still work in progress !!**
-
-Simple midi library for C++.
-
-It requires C++20!
+Simple midi library for modern C++. It requires C++20! Currently only supports Window's midi api.
 
 Documentation: https://code.kaixo.me/Midijo/
 
-Here's a quick example.
+## Some quick examples
+Input
 ```cpp
 MidiIn midi;
 
@@ -26,13 +22,35 @@ midi.Callback([](const NoteOn& e)
     std::cout << e.Note() << ", " << e.Velocity() << '\n';
 });
 
-// Open device with id 0 and start.
 midi.Open({.device = 0 });
-midi.Start();
 
-// Receive events for 10 seconds.
-std::this_thread::sleep_for(std::chrono::seconds(10));
+{
+    // Add a scoped callback
+    Callback c = in.ScopedCallback([](const CC& e)
+    {
+        std::cout << e.Number() << ", " << e.Value() << '\n';
+    });
 
-// Close the device.
+    // Added callback gets remove when it goes out of scope 5 seconds later.
+    // This is useful when registering callbacks in objects, since it automatically
+    // removes the callback when the object is destroyed.
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+}
+
+std::this_thread::sleep_for(std::chrono::seconds(5));
+
 midi.Close();
+```
+Output
+```cpp
+MidiOut out;
+
+out.Open({ .device = 0 });
+
+// Set note on and off message.
+out.Message(NoteOn{ Note::C5, 127 });
+std::this_thread::sleep_for(std::chrono::seconds(1));
+out.Message(NoteOff{ Note::C5, 127 });
+
+out.Close();
 ```

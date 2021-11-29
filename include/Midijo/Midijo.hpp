@@ -39,28 +39,6 @@ namespace Midijo
          * NoError - If stream opened successfully
          */
         Error Open(const MidiParameters& settings = MidiParameters{}) { return m_Api->Open(settings); };
-        
-        /**
-         * Start the midi device.
-         * @return
-         * NotOpen - If the stream wasn't opened<br>
-		 * AlreadyRunning - If the stream is already running<br>
-		 * InvalidDevice - If the opened device id has become invalid<br>
-         * Fail - If the device failed to start<br>
-         * NoError - If stream started successfully
-         */
-        Error Start() { return m_Api->Start(); };
-
-        /**
-         * Stop the midi device.
-         * @return
-		 * NotOpen - If the stream wasn't opened<br>
-		 * NotRunning - If the stream is not running<br>
-         * InvalidDevice - If the opened device id has become invalid<br>
-         * Fail - If the device failed to stop<br>
-         * NoError - If stream stopped successfully
-         */
-        Error Stop() { return m_Api->Stop(); };
 
         /**
          * Close the midi device.
@@ -77,12 +55,14 @@ namespace Midijo
         Midijo::Api m_Type = api;
     };
 
+#ifdef _WIN32
     template<>
     class Midi<Windows> : public Midi<>
     {
     public:
         /**
-         * Search for all available devices. When called more than once, the list will be updated.
+         * Search for all available devices.
+         * @param reload reload the device list.
          * @return all available devices given the chosen api.
          */
         const std::vector<DeviceInfo<Windows>>& Devices(bool reload = false) const { return ((WindowsInApi*)m_Api.get())->Devices(reload); }
@@ -94,6 +74,7 @@ namespace Midijo
          */
         const DeviceInfo<Windows>& Device(int id) const { return ((WindowsInApi*)m_Api.get())->ApiDevice(id); }
     };
+#endif
 
     template<Api api = Unspecified>
     class MidiIn : public Midi<api>
@@ -133,7 +114,7 @@ namespace Midijo
          * Get the current api of this midi.
          * @return api
          */
-        Midijo::Api Api() const { return m_Type; }
+        Midijo::Api Api() const { return this->m_Type; }
 
         /**
          * Add a midi event callback. The returned Callback object will
@@ -211,7 +192,13 @@ namespace Midijo
          * Get the current api of this midi.
          * @return api
          */
-        Midijo::Api Api() const { return m_Type; }
+        Midijo::Api Api() const { return this->m_Type; }
+
+        /**
+         * Send a message to the device.
+         * @param Event event to send
+         */
+        void Message(const Event& e) { this->m_Api->Message(e); }
     };
 
     MidiIn(Api)->MidiIn<Unspecified>;

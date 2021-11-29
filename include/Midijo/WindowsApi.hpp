@@ -41,8 +41,6 @@ namespace Midijo
         const std::vector<DeviceInfo<Windows>>& Devices(bool reload = false) override;
 
         Error Open(const MidiParameters& settings = MidiParameters{}) override;
-        Error Start() override;
-        Error Stop() override;
         Error Close() override;
 
     private:
@@ -59,11 +57,16 @@ namespace Midijo
         ~WindowsOutApi() { Close(); }
 
         const std::vector<DeviceInfo<Windows>>& Devices(bool reload = false) override;
+        void Message(const Event&) override;
 
         Error Open(const MidiParameters& settings = MidiParameters{}) override;
-        Error Start() override;
-        Error Stop() override;
         Error Close() override;
+
+    private:
+        HMIDIOUT m_Midi;
+
+        static void CALLBACK MidiOutProc(HMIDIOUT hMidiOut, UINT wMsg, DWORD_PTR dwInstance,
+            DWORD_PTR dwParam1, DWORD_PTR dwParam2);
     };
 }
 #endif

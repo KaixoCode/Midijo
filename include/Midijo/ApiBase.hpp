@@ -4,7 +4,6 @@
 
 namespace Midijo 
 {
-
 #ifdef _WIN32
 #define DEFAULT_MIDIJO_API Windows
 #else
@@ -54,7 +53,7 @@ namespace Midijo
 
     enum MidiState
     {
-        Closed, Opened, Running
+        Closed, Opened
     };
 
     struct MidiInformation
@@ -75,14 +74,12 @@ namespace Midijo
     {
         NoError = 0,
 
-        NoMemory, // Failed to allocate memory
-        InUse, // Midi device is already in use
+        NoMemory,      // Failed to allocate memory
+        InUse,         // Midi device is already in use
         InvalidDevice, // The provided device id is invalid
         
         NotOpen,        // Midi is not open
-        NotRunning,     // Midi is not running
         AlreadyOpen,    // Midi is already open
-        AlreadyRunning, // Midi is already running
         Fail,           // General fail, either hardware or other. (Api specific fail)
     };
 
@@ -95,8 +92,6 @@ namespace Midijo
         virtual const MidiInformation& Information() const { return m_Information; }
 
         virtual Error Open(const MidiParameters & = {}) = 0;
-        virtual Error Start() = 0;
-        virtual Error Stop() = 0;
         virtual Error Close() = 0;
 
         EventListener listener;
@@ -115,6 +110,8 @@ namespace Midijo
 
         void HandleEvents();
         bool HandleEvent();
+
+        virtual void Message(const Event&) {};
 
     protected:
         MidiInformation m_Information;

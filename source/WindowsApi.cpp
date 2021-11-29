@@ -4,6 +4,7 @@
 namespace Midijo
 {
 #define CHECK(x, msg, type) if (x != MMSYSERR_NOERROR) { LOGL(msg); type; }
+
     WindowsInApi::WindowsInApi()
     {    // Load devices
         Devices(true);
@@ -43,36 +44,7 @@ namespace Midijo
             : _res == MMSYSERR_BADDEVICEID ? InvalidDevice 
             : _res == MMSYSERR_NOMEM ? NoMemory : Fail);
 
-        m_Information.state = Opened;
-
-        return NoError; 
-    }    
-    
-    Error WindowsInApi::Start()
-    {
-        if (m_Information.state == Closed)
-            return NotOpen;
-
-        if (m_Information.state == Running)
-            return AlreadyRunning;
-
-        MMRESULT _res = midiInStart(m_Midi);
-        CHECK(_res, "Failed to close midi device", return _res == MMSYSERR_INVALHANDLE ? InvalidDevice : Fail);
-
-        m_Information.state = Running;
-
-        return NoError;
-    }
-
-    Error WindowsInApi::Stop()
-    {
-        if (m_Information.state == Closed)
-            return NotOpen;
-
-        if (m_Information.state != Running)
-            return NotRunning;
-
-        MMRESULT _res = midiInStop(m_Midi);
+        _res = midiInStart(m_Midi);
         CHECK(_res, "Failed to close midi device", return _res == MMSYSERR_INVALHANDLE ? InvalidDevice : Fail);
 
         m_Information.state = Opened;
@@ -85,10 +57,10 @@ namespace Midijo
         if (m_Information.state == Closed)
             return NotOpen;
 
-        if (m_Information.state == Running)
-            Stop();
+        MMRESULT _res = midiInStop(m_Midi);
+        CHECK(_res, "Failed to close midi device", return _res == MMSYSERR_INVALHANDLE ? InvalidDevice : Fail);
 
-        MMRESULT _res = midiInClose(m_Midi);
+        _res = midiInClose(m_Midi);
         CHECK(_res, "Failed to close midi device", return _res == MMSYSERR_INVALHANDLE ? InvalidDevice : Fail);
 
         m_Information.state = Closed;
@@ -143,28 +115,49 @@ namespace Midijo
         return m_Devices;
     }
 
+    void WindowsOutApi::Message(const Event& e) 
+    {
+        midiOutShortMsg(m_Midi, (
+            (static_cast<uint32_t>(e.byte1) << 0) |
+            (static_cast<uint32_t>(e.byte2) << 8) |
+            (static_cast<uint32_t>(e.byte3) << 16) |
+            (static_cast<uint32_t>(e.byte4) << 24)));
+    }
+
     Error WindowsOutApi::Open(const MidiParameters& settings) 
     {
-        //midiOutOpen();
-        return NoError; 
-    }
+        if (m_Information.state != Closed)
+            return AlreadyOpen;
 
-    Error WindowsOutApi::Start()
-    {
-        //midiOutOpen();
-        return NoError;
-    }
+        m_Information = settings;
 
-    Error WindowsOutApi::Stop()
-    {
-        //midiOutOpen();
+        MMRESULT _res = midiOutOpen(&m_Midi, settings.device, (DWORD_PTR)&MidiOutProc, (DWORD_PTR)this, CALLBACK_FUNCTION);
+        CHECK(_res, "Failed to open midi device", return
+            _res == MMSYSERR_ALLOCATED ? InUse
+            : _res == MMSYSERR_BADDEVICEID ? InvalidDevice
+            : _res == MMSYSERR_NOMEM ? NoMemory : Fail);
+
+        m_Information.state = Opened;
+
         return NoError;
     }
 
     Error WindowsOutApi::Close() 
-    { 
+    {
+        if (m_Information.state == Closed)
+            return NotOpen;
+
+        MMRESULT _res = midiOutClose(m_Midi);
+        CHECK(_res, "Failed to close midi device", return _res == MMSYSERR_INVALHANDLE ? InvalidDevice : Fail);
+
+        m_Information.state = Closed;
+
         return NoError; 
     }
 
+    void WindowsOutApi::MidiOutProc(HMIDIOUT hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
+    {
+        WindowsOutApi* _api = (WindowsOutApi*)dwInstance;
+    }
 }
 #endif

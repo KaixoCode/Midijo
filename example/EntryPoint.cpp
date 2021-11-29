@@ -4,10 +4,10 @@ using namespace Midijo;
 
 int main()
 {
-    MidiIn midi;
+    MidiIn in;
     
     // Register a callback for any event type.
-    midi.Callback([](const Event& e)
+    in.Callback([](const Event& e)
     {
         std::cout << 
             (int)e.byte1 << ", " << (int)e.byte2 << ", " << 
@@ -15,20 +15,27 @@ int main()
     });
     
     // Register a callback for a specific event type.
-    midi.Callback([](const NoteOn& e) 
+    in.Callback([](const NoteOn& e)
     {
         std::cout << e.Note() << ", " << e.Velocity() << '\n';
     });
     
-    midi.Api();
-
-    // Open device with id 0 and start.
-    midi.Open({.device = 0 });
-    midi.Start();
+    // Open device with id 0.
+    in.Open({.device = 0 });
     
     // Receive events for 10 seconds.
     std::this_thread::sleep_for(std::chrono::seconds(10));
     
     // Close the device.
-    midi.Close();
+    in.Close();
+
+    MidiOut out;
+
+    out.Open({ .device = 0 });
+
+    out.Message(NoteOn{ Note::C5, 127 });
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    out.Message(NoteOff{ Note::C5, 127 });
+
+    out.Close();
 }

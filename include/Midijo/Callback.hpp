@@ -104,6 +104,24 @@ namespace Midijo
     struct NoteOn : public Event
     {
         using Event::Event;
+
+        /**
+         * Create note on event.
+         * @param note note
+         * @param velocity velocity
+         */
+        NoteOn(Midijo::Note note, uint8_t velocity) 
+            : Event(0x90, note & 0xF + (12 * (note >> 4)), velocity, 0)
+        {}
+
+        /**
+         * Create note on event.
+         * @param raw raw note number
+         * @param velocity velocity
+         */
+        NoteOn(uint8_t raw, uint8_t velocity)
+            : Event(0x90, raw, velocity, 0)
+        {}
         
         /**
          * Get the midi note that was pressed.
@@ -133,6 +151,24 @@ namespace Midijo
     struct NoteOff : public Event
     {
         using Event::Event;
+
+        /**
+         * Create note off event.
+         * @param note note
+         * @param velocity velocity
+         */
+        NoteOff(Midijo::Note note, uint8_t velocity)
+            : Event(0x80, note & 0xF + (12 * (note >> 4)), velocity, 0)
+        {}
+
+        /**
+         * Create note off event.
+         * @param raw raw note number
+         * @param velocity velocity
+         */
+        NoteOff(uint8_t raw, uint8_t velocity)
+            : Event(0x80, raw, velocity, 0)
+        {}
 
         /**
          * Get the midi note that was pressed.
@@ -165,6 +201,24 @@ namespace Midijo
         using Event::Event;
 
         /**
+         * Create aftertouch event.
+         * @param note note
+         * @param amount amount
+         */
+        Aftertouch(Midijo::Note note, uint8_t amount)
+            : Event(0xA0, note & 0xF + (12 * (note >> 4)), amount, 0)
+        {}
+
+        /**
+         * Create aftertouch event.
+         * @param raw raw note number
+         * @param amount amount
+         */
+        Aftertouch(uint8_t raw, uint8_t amount)
+            : Event(0xA0, raw, amount, 0)
+        {}
+
+        /**
          * Get the midi note that was pressed.
          * @return midi note
          */
@@ -195,6 +249,15 @@ namespace Midijo
         using Event::Event;
 
         /**
+         * Create cc event.
+         * @param number number
+         * @param value value
+         */
+        CC(uint8_t number, uint8_t value)
+            : Event(0xB0, number, value, 0)
+        {}
+
+        /**
          * Get the cc number that was updated.
          * @return cc number
          */
@@ -218,6 +281,14 @@ namespace Midijo
         using Event::Event;
 
         /**
+         * Create program change event.
+         * @param program program
+         */
+        ProgramChange(uint8_t program)
+            : Event(0xC0, program, 0, 0)
+        {}
+
+        /**
          * Get the program.
          * @return program
          */
@@ -235,6 +306,14 @@ namespace Midijo
         using Event::Event;
 
         /**
+         * Create channel aftertouch event.
+         * @param amount amount
+         */
+        ChannelAftertouch(uint8_t amount)
+            : Event(0xD0, amount, 0, 0)
+        {}
+
+        /**
          * Get the aftertouch amount.
          * @return amount
          */
@@ -250,6 +329,14 @@ namespace Midijo
     struct PitchBend : public Event
     {
         using Event::Event;
+
+        /**
+         * Create pitch bend event.
+         * @param amount amount
+         */
+        PitchBend(uint8_t amount)
+            : Event(0xE0, amount, 0, 0)
+        {}
 
         /**
          * Get the pitch bend value.

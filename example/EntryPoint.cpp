@@ -19,12 +19,23 @@ int main()
     {
         std::cout << e.Note() << ", " << e.Velocity() << '\n';
     });
-    
+
     // Open device with id 0.
     in.Open({.device = 0 });
-    
+
+    {
+        // Callback added
+        Callback c = in.ScopedCallback([](const CC& e)
+        {
+            std::cout << e.Number() << ", " << e.Value() << '\n';
+        });
+
+        // Added callback gets remove when it goes out of scope 5 seconds later.
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+
     // Receive events for 10 seconds.
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     
     // Close the device.
     in.Close();

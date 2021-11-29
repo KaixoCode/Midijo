@@ -1,38 +1,35 @@
-# Audijo
-
-**It is in beta!**
-Help me test this badboi, I can't really test all edge cases since I myself only have 2 ASIO devices. So if you find any bugs or crashes lemme know. If you want to use ASIO you're going to have to download the asio sdk and put the asio folder in the folder <code>./sdk</code>.
+# Midijo
+Simple midi library for C++.
 
 It requires C++20!
 
-Documentation: https://code.kaixo.me/Audijo/
+Documentation: https://code.kaixo.me/Midijo/
 
-Here's a quick example, it opens the default Wasapi device and just generates noise.
+Here's a quick example.
 ```cpp
-Stream<Wasapi> _stream;
+MidiIn midi;
 
-// Generate noise
-_stream.Callback([&](Buffer<float>& input, Buffer<float>& output, CallbackInfo info) {   
-    for (auto& _frame : output)
-        for (auto& _channel : _frame)
-            _channel = 0.5 * ((std::rand() % 10000) / 10000. - 0.5);
+// Register a callback for any event type.
+midi.Callback([](const Event& e)
+{
+    std::cout << 
+        (int)e.byte1 << ", " << (int)e.byte2 << ", " << 
+        (int)e.byte3 << ", " << (int)e.byte4 << '\n';
 });
 
-_stream.Open({ // Open stream
-    .input = NoDevice,
-    .output = Default,
-    .bufferSize = Default, 
-    .sampleRate = Default 
+// Register a callback for a specific event type.
+midi.Callback([](const NoteOn& e) 
+{
+    std::cout << e.Note() << ", " << e.Velocity() << '\n';
 });
 
-// Get information
-_stream.Information().sampleRate;
-_stream.Information().bufferSize; // etc.
+// Open device with id 0 and start.
+midi.Open({.device = 0 });
+midi.Start();
 
-// Start stream
-_stream.Start();
-std::cin.get(); // Wait for console input to close stream
-_stream.Close();
+// Receive events for 10 seconds.
+std::this_thread::sleep_for(std::chrono::seconds(10));
+
+// Close the device.
+midi.Close();
 ```
-
-Simply an up to date audio library with actual documentation and full ASIO/WASAPI support.

@@ -34,7 +34,7 @@ int main()
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
-    // Receive events for 10 seconds.
+    // Receive events for 5 seconds.
     std::this_thread::sleep_for(std::chrono::seconds(5));
     
     // Close the device.

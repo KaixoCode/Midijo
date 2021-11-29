@@ -1,4 +1,7 @@
 # Midijo
+
+**!! Still work in progress !!**
+
 Simple midi library for C++.
 
 It requires C++20!

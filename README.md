@@ -4,6 +4,18 @@ Simple midi library for modern C++. It requires C++20! Currently only supports W
 Documentation: https://code.kaixo.me/Midijo/
 
 ## Some quick examples
+Query devices, works same for input and output.
+```cpp
+MidiIn midi;
+for (auto& device : midi.Devices())
+{
+    // Access device information from the struct.
+    device.name;
+    device.id;
+    device.api;
+}
+
+```
 Input
 ```cpp
 MidiIn midi;

@@ -101,7 +101,7 @@ namespace Midijo
 
         m_Devices.clear();
 
-        auto _count = midiInGetNumDevs();
+        auto _count = midiOutGetNumDevs();
         for (auto i = 0; i < _count; i++)
         {
             MIDIOUTCAPS info;

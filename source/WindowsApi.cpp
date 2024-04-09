@@ -5,9 +5,12 @@ namespace Midijo
 {
 #define CHECK(x, msg, type) if (x != MMSYSERR_NOERROR) { LOGL(msg); type; }
 
-    WindowsInApi::WindowsInApi()
-    {    // Load devices
-        Devices(true);
+    WindowsInApi::WindowsInApi(bool loadDevices)
+    {
+        if (loadDevices) {
+            // Load devices
+            Devices(true);
+        }
     }
 
     const std::vector<DeviceInfo<Windows>>& WindowsInApi::Devices(bool reload)
@@ -89,9 +92,12 @@ namespace Midijo
         }
     }
 
-    WindowsOutApi::WindowsOutApi()
-    {    // Load devices
-        Devices(true);
+    WindowsOutApi::WindowsOutApi(bool loadDevices)
+    {
+        if (loadDevices) {
+            // Load devices
+            Devices(true);
+        }
     }
 
     const std::vector<DeviceInfo<Windows>>& WindowsOutApi::Devices(bool reload)

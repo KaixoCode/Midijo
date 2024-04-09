@@ -84,8 +84,8 @@ namespace Midijo
          * Constructor
          * @param a api
          */
-        MidiIn() requires (api != Unspecified) { Api(api); }
-        MidiIn(Api a) requires (api == Unspecified) { Api(a); }
+        MidiIn(bool loadDevices = true) requires (api != Unspecified) { Api(api, loadDevices); }
+        MidiIn(Api a, bool loadDevices = true) requires (api == Unspecified) { Api(a, loadDevices); }
 
         /**
          * Get this MidiIn object as a specific api, to expose api specific functions.
@@ -98,13 +98,13 @@ namespace Midijo
          * Set the api.
          * @param api api
          */
-        void Api(Midijo::Api a)
+        void Api(Midijo::Api a, bool loadDevices = true)
         {
             this->m_Type = a;
             switch (a)
             {
 #ifdef _WIN32
-            case Windows: this->m_Api = std::make_unique<WindowsInApi>(); break;
+            case Windows: this->m_Api = std::make_unique<WindowsInApi>(loadDevices); break;
 #endif
             default: throw std::exception("Incompatible api");
             }
@@ -162,8 +162,8 @@ namespace Midijo
          * Constructor
          * @param a api
          */
-        MidiOut() requires (api != Unspecified) { Api(api); }
-        MidiOut(Api a) requires (api == Unspecified) { Api(a); }
+        MidiOut(bool loadDevices = true) requires (api != Unspecified) { Api(api, loadDevices); }
+        MidiOut(Api a, bool loadDevices = true) requires (api == Unspecified) { Api(a, loadDevices); }
 
         /**
          * Get this MidiIn object as a specific api, to expose api specific functions.
@@ -176,13 +176,13 @@ namespace Midijo
          * Set the api.
          * @param api api
          */
-        void Api(Midijo::Api api)
+        void Api(Midijo::Api api, bool loadDevices = true)
         {
             this->m_Type = api;
             switch (api)
             {
 #ifdef _WIN32
-            case Windows: this->m_Api = std::make_unique<WindowsOutApi>(); break;
+            case Windows: this->m_Api = std::make_unique<WindowsOutApi>(loadDevices); break;
 #endif
             default: throw std::exception("Incompatible api");
             }

@@ -35,7 +35,7 @@ namespace Midijo
     class WindowsInApi : public WindowsApi
     {
     public:
-        WindowsInApi();
+        WindowsInApi(bool loadDevices = true);
         ~WindowsInApi() { Close(); }
 
         const std::vector<DeviceInfo<Windows>>& Devices(bool reload = false) override;
@@ -53,7 +53,7 @@ namespace Midijo
     class WindowsOutApi : public WindowsApi
     {
     public:
-        WindowsOutApi();
+        WindowsOutApi(bool loadDevices = true);
         ~WindowsOutApi() { Close(); }
 
         const std::vector<DeviceInfo<Windows>>& Devices(bool reload = false) override;
